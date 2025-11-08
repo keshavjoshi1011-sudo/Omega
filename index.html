@@ -1,0 +1,299 @@
+DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omega</title>
+<style>
+*{margin:20;position:padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{transition: background 0.6s, color 0.6s;}
+body.light{background:#f5f5f5;color:#1a1a1a;}
+body.dark{background:#121212;color:#fff;}
+
+/* --- Page Border --- */
+#container{
+  max-width:1200px;margin:20px auto;padding:20px;border-radius:20px;border:2px solid #ccc;overflow:hidden;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.15);transition:0.6s;
+  background:inherit;color:inherit;
+}
+
+/* --- Landing Page --- */
+#landing{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;height:80vh;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+#landing::after{
+  content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.1);border-radius:20px;
+}
+#landingContent{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
+#landing h1{font-size:3rem;margin-bottom:0px;opacity:0;position:absolute;bottom:225px;transform:translateY(20px);animation:fadeIn 1s forwards;}
+#landing p{font-size:1.2rem;margin-bottom:30px;position:relative;top:-110px;opacity:0;transform:translateY(20px);animation:fadeIn 1s forwards 0.3s;}
+
+/* --- Class Buttons --- */
+.classContainer{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;position: absolute;bottom:-230px;opacity:0;transform:translateY(100px);animation:fadeIn 1s forwards 0.6s;}
+.classBtn {
+  padding: 15px 30px;         /* bigger button */
+  border: none;
+  border-radius: 12px;        /* round edges */
+  background-color: #fff;      /* default background, will change with theme */
+  color: #000;                 /* default text, will change with theme */
+  font-weight: 600;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: none;            /* remove shadow */
+}
+
+/* --- Theme Colors --- */
+body.light .classBtn {
+  background-color: #fff;      /* white in light mode */
+  color: #000;                 /* black text */
+}
+
+body.dark .classBtn {
+  background-color: #1a1a1a;  /* black in dark mode */
+  color: #fff;                 /* white text */
+}
+
+/* --- Hover Effect --- */
+.classBtn:hover {
+  transform: scale(1.05);
+}
+
+/* --- Floating symbols --- */
+.floating-symbol{position:absolute;font-size:1.2rem;opacity:0.7;animation:float 10s linear infinite;}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-20px);}100%{transform:translateY(0);}}
+
+/* --- Landing Theme Toggle Slider --- */
+#landingThemeToggle{
+  position:absolute;top:20px;right:142px;width:60px;height:30px;background:#ccc;border-radius:30px;cursor:pointer;display:flex;align-items:center;padding:3px;transition:background 0.4s;z-index:3;
+}
+#landingThemeToggle.dark{background:#555;}
+#landingThemeToggle .toggle-circle{
+  width:24px;height:24px;background:#fff;border-radius:50%;transition:0.4s;display:flex;justify-content:center;align-items:center;font-size:0.8rem;
+}
+#landingThemeToggle.dark .toggle-circle{transform:translateX(30px);}
+
+/* --- Fade Animations --- */
+@keyframes fadeIn{to{opacity:1;transform:translateY(0);}}
+
+/* --- Main Page --- */
+#main{display:none;padding:20px;transition:0.6s;opacity:0;transform:translateY(20px);}
+
+/* --- Back Button --- */
+#backBtn{padding:10px 20px;border:none;border-radius:10px;background:#ff6b6b;color:#fff;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:0.3s;margin-bottom:15px;}
+#backBtn:hover{transform:scale(1.05);}
+
+/* --- Search Bar --- */
+#searchContainer{margin-bottom:20px;text-align:center;}
+#searchInput{padding:12px 20px;width:80%;max-width:400px;border-radius:8px;border:1px solid #ccc;box-shadow:0 3px 8px rgba(0,0,0,0.1);transition:0.3s;}
+#searchInput:focus{outline:none;border-color:#2575fc;box-shadow:0 0 12px rgba(37,117,252,0.3);transform:scale(1.02);}
+
+/* --- Subject Buttons --- */
+#subjectMenu{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;}
+.subjectBtn{padding:12px 25px;border:none;border-radius:6px;background:#1abc9c;color:#fff;font-weight:500;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:0.3s;font-size:1rem;}
+.subjectBtn:hover{transform:scale(1.05);box-shadow:0 5px 12px rgba(0,0,0,0.2);}
+
+/* --- Formula Cards --- */
+.formula-card{display:none;padding:15px;margin:10px auto;border-radius:10px;background:rgba(37,117,252,0.08);max-width:500px;opacity:0;transition:0.3s, transform 0.3s;transform:translateY(20px);}
+
+/* --- Calculator Button --- */
+#calcToggle{position:fixed;bottom:25px;right:25px;width:60px;height:60px;border-radius:12px;background:#2575fc;color:#fff;display:flex;justify-content:center;align-items:center;font-size:1.8rem;cursor:pointer;box-shadow:0 6px 15px rgba(0,0,0,0.3);transition:0.3s;display:none;}
+#calcToggle:hover{transform:scale(1.1);box-shadow:0 8px 20px rgba(0,0,0,0.4);}
+
+/* --- Calculator Panel --- */
+#calculator{position:fixed;bottom:100px;right:25px;width:280px;background:#f1f1f1;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.3);display:none;flex-direction:column;overflow:hidden;opacity:0;transform:translateY(20px);transition:0.4s;}
+#calcScreen{padding:12px;font-size:1.2rem;border:none;background:#eee;width:calc(100% - 24px);margin:0 12px 10px 12px;border-radius:8px;}
+.calcRow{display:flex;margin-bottom:5px;}
+.calcBtn{flex:1;padding:15px;font-size:1rem;border:1px solid #ccc;border-radius:6px;margin:2px;background:#fff;transition:0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.15);}
+.calcBtn:hover{background:#e0e0e0;transform:scale(1.05);}
+.calcBtn:active{transform:scale(0.95);}
+</style>
+</head>
+<body class="light">
+
+<div id="container">
+
+<!-- --- Landing Page --- -->
+<div id="landing">
+  <div id="landingContent">
+    <h1>Omega</h1>
+    <p>Explore formulas from Math, Physics, Chemistry, and more.</p>
+    <div class="classContainer">
+      <button class="classBtn" data-class="10th">Class 10</button>
+      <button class="classBtn" data-class="11th">Class 11</button>
+      <button class="classBtn" data-class="12th">Class 12</button>
+      <button class="classBtn" data-class="higher">Higher Studies</button>
+    </div>
+    <div id="landingThemeToggle"><div class="toggle-circle">🌙</div></div>
+  </div>
+  <!-- Floating symbols -->
+  <div class="floating-symbol" style="top:20%;left:10%;">∑</div>
+  <div class="floating-symbol" style="top:30%;left:70%;">π</div>
+  <div class="floating-symbol" style="top:50%;left:40%;">E=mc²</div>
+  <div class="floating-symbol" style="top:60%;left:80%;">√</div>
+  <div class="floating-symbol" style="top:75%;left:20%;">α</div>
+</div>
+
+<!-- --- Main Page --- -->
+<div id="main">
+  <button id="backBtn">Back</button>
+  
+  <div id="searchContainer">
+    <input type="text" id="searchInput" placeholder="Search formula...">
+  </div>
+
+  <div id="subjectMenu">
+    <button class="subjectBtn" data-subject="Math">Math</button>
+    <button class="subjectBtn" data-subject="Physics">Physics</button>
+    <button class="subjectBtn" data-subject="Chemistry">Chemistry</button>
+    <button class="subjectBtn" data-subject="Geometry">Geometry</button>
+    <button class="subjectBtn" data-subject="Statistics">Statistics</button>
+    <button class="subjectBtn" data-subject="General Science">General Science</button>
+  </div>
+
+  <div id="formulaSection">
+    <!-- Formula cards will be added later -->
+  </div>
+</div>
+
+<!-- --- Calculator Button --- -->
+<div id="calcToggle">÷</div>
+
+<!-- --- Calculator Panel --- -->
+<div id="calculator">
+  <input type="text" id="calcScreen" readonly>
+  <div class="calcRow">
+    <button class="calcBtn" onclick="press('7')">7</button>
+    <button class="calcBtn" onclick="press('8')">8</button>
+    <button class="calcBtn" onclick="press('9')">9</button>
+    <button class="calcBtn" onclick="press('/')">/</button>
+  </div>
+  <div class="calcRow">
+    <button class="calcBtn" onclick="press('4')">4</button>
+    <button class="calcBtn" onclick="press('5')">5</button>
+    <button class="calcBtn" onclick="press('6')">6</button>
+    <button class="calcBtn" onclick="press('*')">*</button>
+  </div>
+  <div class="calcRow">
+    <button class="calcBtn" onclick="press('1')">1</button>
+    <button class="calcBtn" onclick="press('2')">2</button>
+    <button class="calcBtn" onclick="press('3')">3</button>
+    <button class="calcBtn" onclick="press('-')">-</button>
+  </div>
+  <div class="calcRow">
+    <button class="calcBtn" onclick="press('0')">0</button>
+    <button class="calcBtn" onclick="press('.')">.</button>
+    <button class="calcBtn" onclick="calculate()">=</button>
+    <button class="calcBtn" onclick="press('+')">+</button>
+  </div>
+  <div class="calcRow">
+    <button class="calcBtn" onclick="clearCalc()" style="flex:1;background:#ff4d4d;color:#fff;">C</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// --- Landing Page Class Buttons ---
+document.querySelectorAll('.classBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById('landing').style.opacity=0;
+    document.getElementById('landing').style.transform='translateY(-30px)';
+    setTimeout(()=>{
+      document.getElementById('landing').style.display='none';
+      document.getElementById('main').style.display='block';
+      setTimeout(()=>{
+        document.getElementById('main').style.opacity=1;
+        document.getElementById('main').style.transform='translateY(0)';
+        document.getElementById('calcToggle').style.display='flex';
+      },50);
+    },400);
+  });
+});
+
+// --- Landing Theme Toggle Slider ---
+const landingThemeSwitch = document.getElementById('landingThemeToggle');
+const toggleCircle = landingThemeSwitch.querySelector('.toggle-circle');
+landingThemeSwitch.addEventListener('click', ()=>{
+  const isDark = document.body.classList.toggle('dark');
+  document.body.classList.toggle('light', !isDark);
+  landingThemeSwitch.classList.toggle('dark', isDark);
+  toggleCircle.textContent = isDark ? '☀️' : '🌙';
+});
+
+// --- Calculator Toggle with Animation ---
+const calc = document.getElementById('calculator');
+const calcToggle = document.getElementById('calcToggle');
+calcToggle.addEventListener('click', ()=>{
+  if(calc.style.display==='flex'){
+    calc.style.opacity=0;
+    calc.style.transform='translateY(20px)';
+    setTimeout(()=>{calc.style.display='none';},300);
+  }else{
+    calc.style.display='flex';
+    setTimeout(()=>{calc.style.opacity=1;calc.style.transform='translateY(0)';},10);
+  }
+});
+
+// --- Calculator Functions ---
+let calcInput='';
+function press(val){ calcInput+=val; document.getElementById('calcScreen').value=calcInput;}
+function calculate(){try{document.getElementById('calcScreen').value=eval(calcInput); calcInput='';}catch{document.getElementById('calcScreen').value='Error'; calcInput='';}}
+function clearCalc(){calcInput=''; document.getElementById('calcScreen').value='';}
+
+// --- Search ---
+function searchFormula(){
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.formula-card');
+  cards.forEach(card=>{
+    card.style.display = card.textContent.toLowerCase().includes(input)?'block':'none';
+  });
+}
+
+// --- Subject Buttons ---
+document.querySelectorAll('.subjectBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const subject = btn.dataset.subject;
+    const cards = document.querySelectorAll('.formula-card');
+    cards.forEach(card=>{
+      card.style.display = card.dataset.subject===subject?'block':'none';
+    });
+  });
+});
+
+// --- Animate Cards ---
+function animateCards(){
+  const cards = document.querySelectorAll('.formula-card');
+  cards.forEach((card,i)=>{
+    setTimeout(()=>{card.style.opacity=1;card.style.transform='translateY(0)';}, i*100);
+  });
+}
+
+// --- Mobile touch support ---
+document.querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('touchstart', function(e){ e.preventDefault(); this.click(); });
+});
+
+// --- Back Button to Landing Page ---
+const backBtn = document.getElementById('backBtn');
+backBtn.addEventListener('click', ()=>{
+  // Hide main page
+  document.getElementById('main').style.opacity = 0;
+  document.getElementById('main').style.transform = 'translateY(20px)';
+  document.getElementById('calcToggle').style.display = 'none';
+  
+  setTimeout(()=>{
+    document.getElementById('main').style.display = 'none';
+    
+    // Show landing page
+    document.getElementById('landing').style.display = 'flex';
+    setTimeout(()=>{
+      document.getElementById('landing').style.opacity = 1;
+      document.getElementById('landing').style.transform = 'translateY(0)';
+    },50);
+  },400);
+});
+</script>
+</body>
+</html>
